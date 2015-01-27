@@ -17,7 +17,8 @@
                      (map (fn [x] [(.getPath x) (.toString (.relativize (.toURI file) (.toURI x)))]))))))
        (apply concat)))
 
-(def less4j-profile {:dependencies '[[deraen/less4clj "0.1.0-SNAPSHOT"]]})
+(def less4j-profile {:dependencies '[[deraen/less4clj "0.1.0-SNAPSHOT"]
+                                     [watchtower "0.1.1"]]})
 
 (defn- run-compiler
   "Run the lesscss compiler."
@@ -30,13 +31,22 @@
     (doseq [[path relative-path] (find-main-files source-paths)]
       (leval/eval-in-project
         project'
-        `(less4clj.core/less-compile
-           ~path
-           ~(.getPath (io/file target-path))
-           ~relative-path
-           {:source-map ~source-map
-            :compression ~compression})
-        '(require 'less4clj.core)))))
+        `(let [~'f (fn [& ~'_]
+                     (println (format "Compiling {less}... %s" ~relative-path))
+                     (less4clj.core/less-compile
+                       ~path
+                       ~(.getPath (io/file target-path))
+                       ~relative-path
+                       {:source-map ~source-map
+                        :compression ~compression}))]
+           (if ~watch?
+             (watchtower.core/watcher ~source-paths
+               (watchtower.core/rate 100)
+               (watchtower.core/file-filter watchtower.core/ignore-dotfiles)
+               (watchtower.core/file-filter (watchtower.core/extensions :less))
+               (watchtower.core/on-change ~'f))
+             (~'f)))
+        '(require 'less4clj.core 'watchtower.core)))))
 
 (defn- once
   "Compile less files once."
