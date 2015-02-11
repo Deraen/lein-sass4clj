@@ -17,7 +17,7 @@
                      (map (fn [x] [(.getPath x) (.toString (.relativize (.toURI file) (.toURI x)))]))))))
        (apply concat)))
 
-(def less4j-profile {:dependencies '[[deraen/less4clj "0.1.0-SNAPSHOT"]
+(def less4j-profile {:dependencies '[[deraen/less4clj "0.1.1-SNAPSHOT"]
                                      [watchtower "0.1.1"]]})
 
 (defn- run-compiler
@@ -38,7 +38,8 @@
                        ~(.getPath (io/file target-path))
                        ~relative-path
                        {:source-map ~source-map
-                        :compression ~compression}))]
+                        :compression ~compression
+                        :source-paths ~source-paths}))]
            (if ~watch?
              (watchtower.core/watcher ~source-paths
                (watchtower.core/rate 100)
