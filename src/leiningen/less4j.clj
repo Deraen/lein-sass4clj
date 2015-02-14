@@ -58,7 +58,7 @@
                        :compression ~compression
                        :source-paths ~source-paths})))]
          (if ~watch?
-           (watchtower.core/watcher
+           @(watchtower.core/watcher
              ~source-paths
              (watchtower.core/rate 100)
              (watchtower.core/file-filter watchtower.core/ignore-dotfiles)
