@@ -20,6 +20,22 @@
 (def less4j-profile {:dependencies '[[deraen/less4clj "0.1.2-SNAPSHOT"]
                                      [watchtower "0.1.1"]]})
 
+; From lein-cljsbuild
+(defn- eval-in-project [project form requires]
+  (leval/eval-in-project
+    project
+    ; Without an explicit exit, the in-project subprocess seems to just hang for
+    ; around 30 seconds before exiting.  I don't fully understand why...
+    `(try
+       (do
+         ~form
+         (System/exit 0))
+       (catch Exception e#
+         (do
+           (.printStackTrace e#)
+           (System/exit 1))))
+    requires))
+
 (defn- run-compiler
   "Run the lesscss compiler."
   [project
@@ -27,27 +43,29 @@
     :or {source-map false
          compression false}}
    watch?]
-  (let [project' (project/merge-profiles project [less4j-profile])]
-    (doseq [[path relative-path] (find-main-files source-paths)]
-      (leval/eval-in-project
-        project'
-        `(let [~'f (fn [& ~'_]
-                     (println (format "Compiling {less}... %s" ~relative-path))
-                     (less4clj.core/less-compile
-                       ~path
-                       ~(.getPath (io/file target-path))
-                       ~relative-path
-                       {:source-map ~source-map
-                        :compression ~compression
-                        :source-paths ~source-paths}))]
-           (if ~watch?
-             (watchtower.core/watcher ~source-paths
-               (watchtower.core/rate 100)
-               (watchtower.core/file-filter watchtower.core/ignore-dotfiles)
-               (watchtower.core/file-filter (watchtower.core/extensions :less))
-               (watchtower.core/on-change ~'f))
-             (~'f)))
-        '(require 'less4clj.core 'watchtower.core)))))
+  (let [project' (project/merge-profiles project [less4j-profile])
+        main-files (vec (find-main-files source-paths))]
+    (eval-in-project
+      project'
+      `(let [f# (fn compile-less [& ~'_]
+                  (doseq [[path# relative-path#] ~main-files]
+                    (println (format "Compiling {less}... %s" relative-path#))
+                    (less4clj.core/less-compile
+                      path#
+                      ~(.getPath (io/file target-path))
+                      relative-path#
+                      {:source-map ~source-map
+                       :compression ~compression
+                       :source-paths ~source-paths})))]
+         (if ~watch?
+           (watchtower.core/watcher
+             ~source-paths
+             (watchtower.core/rate 100)
+             (watchtower.core/file-filter watchtower.core/ignore-dotfiles)
+             (watchtower.core/file-filter (watchtower.core/extensions :less))
+             (watchtower.core/on-change f#))
+           (f#)))
+      '(require 'less4clj.core 'watchtower.core))))
 
 (defn- once
   "Compile less files once."
