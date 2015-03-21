@@ -17,7 +17,7 @@
                      (map (fn [x] [(.getPath x) (.toString (.relativize (.toURI file) (.toURI x)))]))))))
        (apply concat)))
 
-(def less4j-profile {:dependencies '[[deraen/less4clj "0.2.0"]
+(def less4j-profile {:dependencies '[[deraen/less4clj "0.2.1"]
                                      [watchtower "0.1.1"]]})
 
 ; From lein-cljsbuild

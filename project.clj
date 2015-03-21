@@ -1,4 +1,4 @@
-(defproject deraen/lein-less4j "0.2.0"
+(defproject deraen/lein-less4j "0.2.1"
   :description "Leinigen task for Less4j"
   :url "https://github.com/Deraen/lein-less4j"
   :license {:name "Eclipse Public License"
