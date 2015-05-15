@@ -10,8 +10,8 @@ Leiningen task to compile Less.
 ## Usage
 
 ```clj
-:less4j {:source-map true
-         :compression true}
+:less {:source-map true
+       :compression true}
 ```
 
 ## Features
