@@ -10,7 +10,9 @@ Leiningen task to compile Less.
 ## Usage
 
 ```clj
-:less {:source-map true
+:less {:source-paths ["src/less"]
+       :target-path "target/generated/public/css"
+       :source-map true
        :compression true}
 ```
 
