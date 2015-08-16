@@ -17,7 +17,7 @@
                      (map (fn [x] [(.getPath x) (.toString (.relativize (.toURI file) (.toURI x)))]))))))
        (apply concat)))
 
-(def less4j-profile {:dependencies '[[deraen/less4clj "0.2.1"]
+(def less4j-profile {:dependencies '[[deraen/less4clj "0.3.1"]
                                      [watchtower "0.1.1"]]})
 
 ; From lein-cljsbuild
@@ -50,7 +50,7 @@
       `(let [f# (fn compile-less [& ~'_]
                   (doseq [[path# relative-path#] ~main-files]
                     (println (format "Compiling {less}... %s" relative-path#))
-                    (less4clj.core/less-compile
+                    (less4clj.core/less-compile-to-file
                       path#
                       ~(.getPath (io/file target-path))
                       relative-path#
