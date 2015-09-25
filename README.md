@@ -4,7 +4,7 @@
 Leiningen task to compile Less.
 
 * Provides the `sass4clj` task
-* For each `.main.scss` in source-dirs creates equivalent `.css` file.
+* For each `.scss` not starting with `_` in source-dirs creates equivalent `.css` file.
 * Uses [jsass](https://github.com/bit3/jsass) through [sass4clj](https://github.com/Deraen/sass4clj) wrapper
 
 ## Usage

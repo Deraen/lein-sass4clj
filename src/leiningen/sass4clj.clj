@@ -6,7 +6,8 @@
     [clojure.java.io :as io]))
 
 (defn main-file? [file]
-  (.endsWith (.getName file) ".main.scss"))
+  (and (.endsWith (.getName file) ".scss")
+       (not (.startsWith (.getName file) "_"))))
 
 (defn find-main-files [source-paths]
   (->> source-paths
