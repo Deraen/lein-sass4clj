@@ -1,5 +1,5 @@
 # lein-sass4clj
-[![Clojars Project](http://clojars.org/deraen/lein-sass4clj/latest-version.svg)](http://clojars.org/deraen/lein-less4clj)
+[![Clojars Project](http://clojars.org/deraen/lein-sass4clj/latest-version.svg)](http://clojars.org/deraen/lein-sass4clj)
 
 Leiningen task to compile Less.
 
