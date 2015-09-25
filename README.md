@@ -10,8 +10,8 @@ Leiningen task to compile Less.
 ## Usage
 
 ```clj
-:scss {:source-paths ["src/scss"]
-       :target-path "target/generated/public/css"}
+:sass4clj {:source-paths ["src/scss"]
+           :target-path "target/generated/public/css"}
 ```
 
 ## Features
