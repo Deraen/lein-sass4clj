@@ -1,4 +1,4 @@
-(ns leiningen.less4j
+(ns leiningen.sass4clj
   (:require
     [leiningen.help]
     [leiningen.core.eval :as leval]
@@ -6,7 +6,7 @@
     [clojure.java.io :as io]))
 
 (defn main-file? [file]
-  (.endsWith (.getName file) ".main.less"))
+  (.endsWith (.getName file) ".main.scss"))
 
 (defn find-main-files [source-paths]
   (->> source-paths
@@ -17,7 +17,7 @@
                      (map (fn [x] [(.getPath x) (.toString (.relativize (.toURI file) (.toURI x)))]))))))
        (apply concat)))
 
-(def less4j-profile {:dependencies '[[deraen/less4clj "0.3.2"]
+(def sass4j-profile {:dependencies '[[deraen/sass4clj "0.1.0-SNAPSHOT"]
                                      [watchtower "0.1.1"]]})
 
 ; From lein-cljsbuild
@@ -37,55 +37,51 @@
     requires))
 
 (defn- run-compiler
-  "Run the lesscss compiler."
+  "Run the sasscss compiler."
   [project
-   {:keys [source-paths target-path source-map compression]
-    :or {source-map false
-         compression false}}
+   {:keys [source-paths target-path]}
    watch?]
-  (let [project' (project/merge-profiles project [less4j-profile])
+  (let [project' (project/merge-profiles project [sass4j-profile])
         main-files (vec (find-main-files source-paths))]
     (eval-in-project
       project'
-      `(let [f# (fn compile-less [& ~'_]
+      `(let [f# (fn compile-sass [& ~'_]
                   (doseq [[path# relative-path#] ~main-files]
-                    (println (format "Compiling {less}... %s" relative-path#))
-                    (less4clj.core/less-compile-to-file
+                    (println (format "Compiling {sass}... %s" relative-path#))
+                    (sass4clj.core/sass-compile-to-file
                       path#
                       ~(.getPath (io/file target-path))
                       relative-path#
-                      {:source-map ~source-map
-                       :compression ~compression
-                       :source-paths ~source-paths})))]
+                      {:source-paths ~source-paths})))]
          (if ~watch?
            @(watchtower.core/watcher
              ~source-paths
              (watchtower.core/rate 100)
              (watchtower.core/file-filter watchtower.core/ignore-dotfiles)
-             (watchtower.core/file-filter (watchtower.core/extensions :less))
+             (watchtower.core/file-filter (watchtower.core/extensions :scss))
              (watchtower.core/on-change f#))
            (f#)))
-      '(require 'less4clj.core 'watchtower.core))))
+      '(require 'sass4clj.core 'watchtower.core))))
 
 (defn- once
-  "Compile less files once."
+  "Compile sass files once."
   [project config]
   (run-compiler project config false))
 
 (defn- auto
-  "Compile less files, then watch for changes and recompile until interrupted."
+  "Compile sass files, then watch for changes and recompile until interrupted."
   [project config]
   (run-compiler project config true))
 
-(defn less4j
-  "Run the {less} css compiler plugin."
+(defn sass4clj
+  "Run the {sass} css compiler plugin."
   {:help-arglists '([once auto])
    :subtasks      [#'once #'auto]}
   ([project]
-   (println (leiningen.help/help-for "less4j"))
+   (println (leiningen.help/help-for "sass4j"))
    (leiningen.core.main/abort))
   ([project subtask & args]
-   (let [config (:less project)]
+   (let [config (:sass4clj project)]
      (case subtask
        "once" (apply once project config args)
        "auto" (apply auto project config args)))))
