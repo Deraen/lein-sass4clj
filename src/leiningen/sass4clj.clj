@@ -3,10 +3,12 @@
     [leiningen.help]
     [leiningen.core.eval :as leval]
     [leiningen.core.project :as project]
-    [clojure.java.io :as io]))
+    [clojure.java.io :as io]
+    [clojure.string :as string]))
 
 (defn main-file? [file]
-  (and (.endsWith (.getName file) ".scss")
+  (and (or (.endsWith (.getName file) ".scss")
+           (.endsWith (.getName file) ".sass") )
        (not (.startsWith (.getName file) "_"))))
 
 (defn find-main-files [source-paths]
@@ -42,24 +44,24 @@
   [project
    {:keys [source-paths target-path]}
    watch?]
-  (let [project' (project/merge-profiles project [sass4j-profile])
-        main-files (vec (find-main-files source-paths))]
+  (let [project' (project/merge-profiles project [sass4j-profile])]
     (eval-in-project
       project'
       `(let [f# (fn compile-sass [& ~'_]
-                  (doseq [[path# relative-path#] ~main-files]
+                  (doseq [[path# relative-path#] ~(vec (find-main-files source-paths))
+                          :let [output-rel-path# (string/replace relative-path# #"\.(sass|scss)$" ".css")
+                                output-path#     (.getPath (io/file ~target-path output-rel-path#))]]
                     (println (format "Compiling {sass}... %s" relative-path#))
                     (sass4clj.core/sass-compile-to-file
                       path#
-                      ~(.getPath (io/file target-path))
-                      relative-path#
+                      output-path#
                       {:source-paths ~source-paths})))]
          (if ~watch?
            @(watchtower.core/watcher
              ~source-paths
              (watchtower.core/rate 100)
              (watchtower.core/file-filter watchtower.core/ignore-dotfiles)
-             (watchtower.core/file-filter (watchtower.core/extensions :scss))
+             (watchtower.core/file-filter (watchtower.core/extensions :scss :sass))
              (watchtower.core/on-change f#))
            (f#)))
       '(require 'sass4clj.core 'watchtower.core))))
