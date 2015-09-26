@@ -42,7 +42,7 @@
 (defn- run-compiler
   "Run the sasscss compiler."
   [project
-   {:keys [source-paths target-path output-style]}
+   {:keys [source-paths target-path output-style verbosity]}
    watch?]
   (let [project' (project/merge-profiles project [sass4j-profile])]
     (eval-in-project
@@ -56,7 +56,8 @@
                       path#
                       output-path#
                       {:source-paths ~source-paths
-                       :output-style ~(if output-style (keyword output-style))})))]
+                       :output-style ~(if output-style (keyword output-style))
+                       :verbosity ~(or verbosity 1)})))]
          (if ~watch?
            @(watchtower.core/watcher
              ~source-paths
