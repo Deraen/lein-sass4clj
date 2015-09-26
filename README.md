@@ -12,7 +12,9 @@ Leiningen task to compile Less.
 
 ```clj
 :sass4clj {:source-paths ["src/scss"]
-           :target-path "target/generated/public/css"}
+           :target-path "target/generated/public/css"
+           ; optional, valid values: :nested :compact :expanded :compressed
+           :output-style :nested}
 ```
 
 ## Features
