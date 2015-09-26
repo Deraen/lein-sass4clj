@@ -20,7 +20,7 @@
                      (map (fn [x] [(.getPath x) (.toString (.relativize (.toURI file) (.toURI x)))]))))))
        (apply concat)))
 
-(def sass4j-profile {:dependencies '[[deraen/sass4clj "0.1.0-SNAPSHOT"]
+(def sass4j-profile {:dependencies '[[deraen/sass4clj "0.1.0"]
                                      [watchtower "0.1.1"]]})
 
 ; From lein-cljsbuild
