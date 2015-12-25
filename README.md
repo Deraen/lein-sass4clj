@@ -1,6 +1,8 @@
 # lein-sass4clj
 [![Clojars Project](http://clojars.org/deraen/lein-sass4clj/latest-version.svg)](http://clojars.org/deraen/lein-sass4clj)
 
+# [Moved to Deraen/sass4clj](https://github.com/Deraen/sass4clj)
+
 Leiningen task to compile Less.
 
 * Provides the `sass4clj` task
